@@ -1,0 +1,21 @@
+---
+
+- name: Sync (push) uploads folder
+  synchronize:
+    src: "{{ local_project_root }}/current/web/app/uploads/"
+    dest: "{{ target_project_root }}/web/app/uploads/"
+    mode: push
+    rsync_opts: 
+      - "--exclude=.DS_Store"
+  when: mode is not defined or mode == "push"
+  notify: Pushed Uploads
+
+- name: Sync (pull) uploads folder
+  synchronize:
+    src: "{{ source_project_root }}/web/app/uploads/"
+    dest: "{{ local_project_root }}/current/web/app/uploads/"
+    mode: pull
+    rsync_opts: 
+      - "--exclude=.DS_Store"
+  when: mode is defined and mode == "pull"
+  notify: Pulled Uploads

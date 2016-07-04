@@ -1,0 +1,37 @@
+---
+############################################
+# PULLED DATABASE
+############################################
+
+- name: Pulled Database
+  file: >
+    path=/tmp/dummy-task.txt
+    state=absent
+
+
+############################################
+# PULLED DATABASE
+############################################
+
+- name: Pushed Database
+  file: >
+    path=/tmp/dummy-task.txt
+    state=absent
+
+############################################
+# PULLED UPLOADS
+############################################
+
+- name: Pulled Uploads
+  file: >
+    path=/tmp/dummy-task.txt
+    state=absent
+
+############################################
+# PUSHED UPLOADS
+############################################
+
+- name: Pushed Uploads
+  file: >
+    path=/tmp/dummy-task.txt
+    state=absent

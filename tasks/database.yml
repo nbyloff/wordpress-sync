@@ -1,0 +1,35 @@
+---
+
+- include: pull-database.yml
+  when: mode == "pull"
+
+- include: push-database.yml
+  when: mode == "push"
+
+- name: Remove Remote Database Archive File
+  file: 
+    path: /tmp/database.sql.tar.gz
+    state: absent
+  when: type == "database"
+
+- name: Remove Remote Database Dump File
+  file: 
+    path: /tmp/database.sql
+    state: absent
+  when: type == "database"
+
+- name: Remove Local Database Dump File
+  file: 
+    path: /tmp/database.sql
+    state: absent
+  when: type == "database"
+  delegate_to: "{{ item }}"
+  with_items: "{{ dev_servers }}"
+
+- name: Remove Local Database Archive File
+  file: 
+    path: /tmp/database.sql.tar.gz
+    state: absent
+  when: type == "database"
+  delegate_to: "{{ item }}"
+  with_items: "{{ dev_servers }}"

@@ -1,0 +1,31 @@
+---
+
+- name: Local database export
+  local_action: "wp db export /tmp/database.sql chdir={{ local_project_root }}"
+  when: mode == "push"
+
+- name: Archive local database
+  shell: "tar -czf /tmp/database.sql.tar.gz database.sql"
+  args:
+    chdir: "/tmp"
+  when: mode == "push"
+
+- name: Push archived database file to remote machine
+  synchronize:  
+    src: "/tmp/database.sql.tar.gz" 
+    dest: "/tmp/database.sql.tar.gz"
+    mode: push
+  when: mode == "push"
+
+- name: Extract archived database file
+  unarchive: src=/tmp/database.sql.tar.gz dest=/tmp copy=no
+  when: mode == "push"
+
+- name: Import database on remote server
+  command: "command wp db import /tmp/database.sql chdir={{ target_project_root }}"
+  when: mode == "push"
+
+- name: Local database search-replace
+  command: "command wp search-replace '{{ local_project_domain }}' '{{ site }}' --url={{ site }} chdir={{ target_project_root }}"  
+  when: mode == "push"
+  notify: Pushed Database

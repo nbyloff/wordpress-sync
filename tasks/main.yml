@@ -1,0 +1,19 @@
+---
+# since we have two environment wordpress_sites, make sure they don't get overwritten when loading
+- set_fact: source_project="{{ source_project }}"
+
+- include_vars: group_vars/development/wordpress_sites.yml
+  register: local_project
+
+- set_fact: local_project="{{ local_project.ansible_facts.wordpress_sites }}"  
+
+- set_fact: local_project_domain="{{ local_project.keys()[0] }}"
+
+- set_fact: local_project_root="{{ www_root }}/{{ local_project_domain }}"
+
+- include: database.yml
+  when: type is defined and type == "database"
+
+- include: uploads.yml
+  when: type is defined and type == "uploads"
+

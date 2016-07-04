@@ -1,0 +1,37 @@
+---
+
+- name: Remote Database Export
+  command: "wp db export /tmp/database.sql chdir={{ source_project_root }}"
+  when: mode == "pull"
+
+- name: Archive Remote Database
+  shell: "tar -czf /tmp/database.sql.tar.gz database.sql"
+  args:
+    chdir: "/tmp"
+  when: mode is not defined or mode == "pull"
+
+- name: Pull archived database file to local control machine
+  synchronize:  
+    src: "/tmp/database.sql.tar.gz" 
+    dest: "/tmp/database.sql.tar.gz"
+    mode: pull
+  #delegate_to: "{{ local_project_domain }}"
+
+- name: Extract Archived Database File
+  unarchive: src=/tmp/database.sql.tar.gz dest=/tmp copy=no
+  delegate_to: "{{ item }}"
+  when: mode == "pull"
+  with_items: "{{ dev_servers }}"
+
+- name: Import Database Locally
+  local_action: "command wp db import /tmp/database.sql chdir={{ source_project.local_path }}"
+  delegate_to: "{{ item }}"
+  when: mode is not defined or mode == "pull"
+  with_items: "{{ dev_servers }}"
+
+- name: Local Database search-replace
+  local_action: "command wp search-replace '{{ site }}' '{{ local_project.keys() }}' --url={{ site }} chdir={{ source_project.local_path }}"  
+  delegate_to: "{{ item }}"
+  when: mode is not defined or mode == "pull"
+  with_items: "{{ dev_servers }}"
+  notify: Pulled Database

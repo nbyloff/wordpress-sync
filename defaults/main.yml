@@ -1,0 +1,6 @@
+---
+
+source_project: "{{ wordpress_sites[site] }}"
+source_project_root: "{{ www_root }}/{{ site }}/current"
+target_project_root: "{{ www_root }}/{{ site }}/current"
+dev_servers: "{{ groups['development'] }}"
